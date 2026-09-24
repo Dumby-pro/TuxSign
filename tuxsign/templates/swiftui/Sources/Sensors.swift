@@ -112,6 +112,8 @@ final class Sensors: NSObject, CLLocationManagerDelegate {
         locationManager.stopUpdatingHeading()
         UIDevice.current.isProximityMonitoringEnabled = false
         recorder?.stop()
+        recorder = nil
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         timer?.invalidate()
     }
 
@@ -134,6 +136,8 @@ final class Sensors: NSObject, CLLocationManagerDelegate {
             Task { @MainActor in
                 let session = AVAudioSession.sharedInstance()
                 try? session.setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
+                // iOS mutes haptics while recording unless the app opts back in.
+                try? session.setAllowHapticsAndSystemSoundsDuringRecording(true)
                 try? session.setActive(true)
                 let url = URL(fileURLWithPath: "/dev/null")
                 let settings: [String: Any] = [AVFormatIDKey: kAudioFormatAppleLossless,

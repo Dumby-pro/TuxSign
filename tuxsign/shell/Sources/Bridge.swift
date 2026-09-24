@@ -173,6 +173,8 @@ final class Bridge: NSObject, WKScriptMessageHandlerWithReply, CLLocationManager
             guard await AVAudioApplication.requestRecordPermission() else { throw BridgeError("microphone denied") }
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
+            // iOS mutes haptics while recording unless the app opts back in.
+            try session.setAllowHapticsAndSystemSoundsDuringRecording(true)
             try session.setActive(true)
             recorder = try AVAudioRecorder(url: URL(fileURLWithPath: "/dev/null"), settings: [
                 AVFormatIDKey: kAudioFormatAppleLossless, AVSampleRateKey: 44100, AVNumberOfChannelsKey: 1])
@@ -187,7 +189,9 @@ final class Bridge: NSObject, WKScriptMessageHandlerWithReply, CLLocationManager
             }
             return true
         case "mic.stop":
-            micTimer?.invalidate(); recorder?.stop(); recorder = nil; return true
+            micTimer?.invalidate(); recorder?.stop(); recorder = nil
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+            return true
 
         case "haptic":
             switch args["style"] as? String ?? "medium" {
