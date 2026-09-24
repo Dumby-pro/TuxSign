@@ -1,0 +1,4 @@
+build/
+*.ipa
+*.p12
+*.mobileprovision

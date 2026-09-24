@@ -1,0 +1,20 @@
+[app]
+name = "{{NAME}}"
+bundle_id = "{{BUNDLE_ID}}"
+kind = "{{KIND}}"
+version = "1.0"
+build = "1"
+min_ios = "26.0"          # iOS 26+ = Liquid Glass
+orientation = ["portrait", "landscape"]
+# icon = "icon.png"       # 1024x1024 PNG
+
+# Override or add privacy strings (all sensor keys are included by default).
+[usage]
+# NSCameraUsageDescription = "Scan QR codes"
+
+# Extra Info.plist keys.
+[info_plist]
+# UIStatusBarStyle = "UIStatusBarStyleLightContent"
+
+# Extra entitlements (must also be allowed by your provisioning profile).
+[entitlements]

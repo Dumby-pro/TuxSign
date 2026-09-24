@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{NAME}}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="glass hero">
+    <h1>{{NAME}}</h1>
+    <p id="device">Loading…</p>
+  </header>
+
+  <main>
+    <section class="glass card">
+      <h2>Motion</h2>
+      <div class="grid" id="motion"></div>
+      <div class="bubble-track"><div class="bubble" id="bubble"></div></div>
+    </section>
+    <section class="glass card">
+      <h2>Location &amp; Compass</h2>
+      <div class="grid" id="location"></div>
+    </section>
+    <section class="glass card">
+      <h2>Barometer &amp; Steps</h2>
+      <div class="grid" id="env"></div>
+    </section>
+    <section class="glass card">
+      <h2>Microphone</h2>
+      <meter id="mic" min="-60" max="0" value="-60"></meter>
+    </section>
+    <section class="glass card">
+      <h2>Device</h2>
+      <div class="grid" id="dev"></div>
+      <div class="buttons">
+        <button class="glass-button" data-haptic="success">Haptic</button>
+        <button class="glass-button" id="auth">Face ID</button>
+        <button class="glass-button" id="torch">Torch</button>
+        <button class="glass-button" id="share">Share</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

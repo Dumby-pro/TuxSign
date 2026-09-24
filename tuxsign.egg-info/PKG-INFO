@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: tuxsign
+Version: 0.1.0
+Summary: Build, package, sign and install iOS apps (SwiftUI or HTML) from Linux
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+
+# TuxSign

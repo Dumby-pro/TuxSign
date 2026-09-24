@@ -1,0 +1,21 @@
+# Builds an unsigned .ipa in the cloud (no Mac or SDK needed).
+# Push this project to GitHub, open the Actions tab, and download the
+# "{{IDENT}}-ipa" artifact. Then sign it on Linux with `tuxsign sign`.
+name: Build IPA
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "git+https://github.com/Dumby-pro/TuxSign"
+      - run: tuxsign build --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: {{IDENT}}-ipa
+          path: build/*.ipa

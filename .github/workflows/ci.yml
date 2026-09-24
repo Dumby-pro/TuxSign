@@ -1,0 +1,58 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  linux:
+    name: Linux tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: tuxsign doctor
+
+  ios:
+    name: Build template IPAs (iOS 26 SDK)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: xcrun --sdk iphoneos --show-sdk-version && swiftc --version
+      - name: SwiftUI template (Liquid Glass + sensors)
+        run: |
+          tuxsign new GlassDemo --path demo-swiftui
+          tuxsign build -C demo-swiftui
+          tuxsign inspect demo-swiftui/build/GlassDemo.ipa
+      - name: HTML template (compiled shell)
+        run: |
+          tuxsign new WebDemo -t html --path demo-html
+          tuxsign build -C demo-html
+          tuxsign inspect demo-html/build/WebDemo.ipa
+      - name: Package prebuilt HTML shell
+        run: |
+          tuxsign new TuxShell -t html --path shell
+          tuxsign build -C shell
+          cd shell/build && zip -qry ../../TuxShell.app.zip Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-ipas
+          path: |
+            demo-swiftui/build/*.ipa
+            demo-html/build/*.ipa
+            TuxShell.app.zip
+      - name: Attach shell to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" TuxShell.app.zip GlassDemo.ipa --clobber || gh release upload "${{ github.event.release.tag_name }}" TuxShell.app.zip --clobber
