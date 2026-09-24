@@ -1,0 +1,104 @@
+/* TuxGlass - Liquid Glass styles. Pair with tux-glass.js. */
+:root {
+  --tg-light: -45deg;                       /* highlight direction (followTilt() drives it) */
+}
+
+.glass-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.glass {
+  --glass-tint: rgba(255, 255, 255, 0.07);
+  --glass-shadow: 0 12px 32px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08);
+  --tg-strength: 1;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 28px;
+  background: transparent;
+  box-shadow: var(--glass-shadow);
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: center;
+  will-change: transform;
+}
+.glass > :not(.tg-layer) { position: relative; z-index: 1; opacity: var(--tg-strength); }
+button.glass, .glass-button {
+  border: 0;
+  font: inherit;
+  color: inherit;
+  padding: 12px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tg-layer {
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.tg-lens { z-index: 0; overflow: hidden; border-radius: 0; opacity: var(--tg-strength); }
+
+/* Fill: adaptive tint plus soft inner light and a faint inner shadow. */
+.tg-tint {
+  inset: 0;
+  z-index: 0;
+  opacity: var(--tg-strength);
+  background: var(--glass-tint);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 0 14px rgba(255, 255, 255, 0.10),
+    inset 0 -10px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Specular rim: bright where the light hits and on the opposite edge,
+   dim along the sides - like light caught by a curved glass edge. */
+.tg-rim {
+  inset: 0;
+  z-index: 0;
+  padding: 1.25px;
+  opacity: calc(0.9 * var(--tg-strength));
+  background: conic-gradient(from var(--tg-light),
+    rgba(255, 255, 255, 0.95) 0deg,
+    rgba(255, 255, 255, 0.28) 40deg,
+    rgba(255, 255, 255, 0.05) 90deg,
+    rgba(255, 255, 255, 0.28) 140deg,
+    rgba(255, 255, 255, 0.70) 180deg,
+    rgba(255, 255, 255, 0.28) 220deg,
+    rgba(255, 255, 255, 0.05) 270deg,
+    rgba(255, 255, 255, 0.28) 320deg,
+    rgba(255, 255, 255, 0.95) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  mix-blend-mode: plus-lighter;
+}
+
+/* Illumination that spreads from the finger while pressed. */
+.tg-glow {
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  background: radial-gradient(circle at var(--tg-x, 50%) var(--tg-y, 50%),
+    rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.12) 35%, transparent 70%);
+  mix-blend-mode: plus-lighter;
+  transition: opacity 0.35s ease;
+}
+.tg-pressed > .tg-glow { opacity: 1; transition-duration: 0.08s; }
+
+/* Variants */
+.glass-clear { --glass-tint: rgba(0, 0, 0, 0.10); }        /* more transparent; dim layer keeps text legible */
+.glass-dark { --glass-tint: rgba(0, 0, 0, 0.22); color: #fff; }
+.glass-hidden { pointer-events: none; }
+
+@media (prefers-color-scheme: dark) {
+  .glass:not(.glass-light) { --glass-tint: rgba(20, 20, 30, 0.18); }
+  .glass:not(.glass-light) > .tg-rim { opacity: calc(0.65 * var(--tg-strength)); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass > .tg-lens { display: none; }
+  .glass { background: rgba(120, 120, 130, 0.85); }
+}

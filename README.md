@@ -42,6 +42,30 @@ tuxsign run -c dev.p12 -m dev.mobileprovision --log
 - **Local SDK:** copy `iPhoneOS.sdk` from any Xcode 26 install, then run `tuxsign sdk add path/to/iPhoneOS.sdk`.
 - **HTML apps without an SDK:** TuxSign downloads the prebuilt shell from this repo's releases, which CI builds. It then copies in your `www/` folder and writes the Info.plist. Nothing gets compiled. You can also run `tuxsign shell add TuxShell.app.zip`.
 
+## Liquid Glass for HTML (TuxGlass)
+
+New HTML projects include `tux-glass.js` and `tux-glass.css`, which bring Liquid Glass to web content:
+
+- **Lensing:** content is bent at the curved rim. The displacement map is calculated from a convex rim profile using Snell's law (IOR 1.5).
+- **Chromatic dispersion:** a three-channel pass adds the faint colour fringe at the edges.
+- **Specular rim:** the highlight catches the light on one side and the opposite edge, and follows device tilt (`TuxGlass.followTilt()`).
+- **Interactive glass:** `glass-interactive` elements flex toward your finger, grow, glow from the touch point and lens more strongly while pressed.
+- **Materialize:** `TuxGlass.show(el)` / `TuxGlass.hide(el)` animate the lensing in and out.
+- **Variants:** regular, `glass-clear`, `glass-dark` and `data-glass-tint="..."`. Dark mode and Reduce Transparency are supported.
+
+```html
+<div class="glass-backdrop"></div>                     <!-- the wallpaper glass refracts -->
+<div class="glass">Card</div>
+<button class="glass glass-interactive">Tap me</button>
+<nav class="glass" data-glass-source=".glass-backdrop, main">…</nav>  <!-- also refracts scrolling content -->
+```
+
+Tuning, per element or as CSS variables: `data-glass-thickness`, `-bezel`, `-ior`, `-frost`, `-dispersion`, `-saturation`.
+
+How it works: WebKit, the engine inside iOS apps, can't apply SVG filters to `backdrop-filter`. So TuxGlass copies each glass element's source (`.glass-backdrop` by default) into that element and refracts the copy with an SVG displacement filter. Two things follow from that:
+- **Only listed sources are refracted.** Glass bends only what its source list contains. Add more selectors with `data-glass-source`.
+- **Don't set `transform` on `.glass` elements.** TuxGlass uses it for animation. Use `translate`, `left` or `top` instead.
+
 ## HTML bridge
 
 ```js

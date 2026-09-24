@@ -4,19 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{NAME}}</title>
+  <link rel="stylesheet" href="tux-glass.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="glass hero">
-    <h1>{{NAME}}</h1>
-    <p id="device">Loading…</p>
-  </header>
+  <!-- Everything glass refracts. Put your wallpaper/background here. -->
+  <div class="glass-backdrop"></div>
 
-  <main>
+  <main id="main">
+    <header class="glass hero">
+      <h1>{{NAME}}</h1>
+      <p id="device">Loading…</p>
+    </header>
+
+    <section class="glass card">
+      <h2>Liquid Glass</h2>
+      <div class="buttons">
+        <button class="glass glass-interactive" id="toggle">Materialize</button>
+        <button class="glass glass-interactive" data-glass-tint="rgba(10,132,255,.45)">Tinted</button>
+        <button class="glass glass-interactive glass-clear">Clear</button>
+      </div>
+      <div class="pill-row">
+        <div class="glass glass-interactive pill" id="pill">Hello from glass ✨</div>
+      </div>
+    </section>
+
     <section class="glass card">
       <h2>Motion</h2>
       <div class="grid" id="motion"></div>
-      <div class="bubble-track"><div class="bubble" id="bubble"></div></div>
+      <div class="bubble-track"><div class="glass bubble" id="bubble" data-glass-bezel="14" data-glass-thickness="26"></div></div>
     </section>
     <section class="glass card">
       <h2>Location &amp; Compass</h2>
@@ -34,14 +50,22 @@
       <h2>Device</h2>
       <div class="grid" id="dev"></div>
       <div class="buttons">
-        <button class="glass-button" data-haptic="success">Haptic</button>
-        <button class="glass-button" id="auth">Face ID</button>
-        <button class="glass-button" id="torch">Torch</button>
-        <button class="glass-button" id="share">Share</button>
+        <button class="glass glass-interactive" data-haptic="success">Haptic</button>
+        <button class="glass glass-interactive" id="auth">Face ID</button>
+        <button class="glass glass-interactive" id="torch">Torch</button>
+        <button class="glass glass-interactive" id="share">Share</button>
       </div>
     </section>
   </main>
 
+  <!-- A tab bar that also refracts the page scrolling underneath it. -->
+  <nav class="glass tabbar" data-glass-source=".glass-backdrop, #main">
+    <button class="tab active" data-tab="top">⌂<span>Home</span></button>
+    <button class="tab" data-tab="sensors">◎<span>Sensors</span></button>
+    <button class="tab" data-tab="device">▣<span>Device</span></button>
+  </nav>
+
+  <script src="tux-glass.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

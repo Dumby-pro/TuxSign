@@ -6,8 +6,25 @@ const $ = (id) => document.getElementById(id);
 const fmt = (v, d = 3) => (typeof v === 'number' ? v.toFixed(d) : '–');
 const grid = (el, rows) => { el.innerHTML = Object.entries(rows).map(([k, v]) => `<span>${k}</span><span>${v}</span>`).join(''); };
 
+function glassDemo() {
+  const pill = $('pill');
+  $('toggle').onclick = () => {
+    const hidden = pill.classList.contains('glass-hidden');
+    hidden ? TuxGlass.show(pill) : TuxGlass.hide(pill);
+    if (window.tux) tux.haptic('light');
+  };
+  const sections = { top: document.querySelector('.hero'), sensors: $('motion').closest('section'), device: $('dev').closest('section') };
+  document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t === tab));
+    sections[tab.dataset.tab].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.tux) tux.haptic('selection');
+  }));
+}
+
 async function main() {
+  glassDemo();
   if (!window.tux) {
+    TuxGlass.followTilt();
     $('device').textContent = 'Browser preview (native sensors run on iPhone)';
     window.addEventListener('devicemotion', (e) => showMotion({ accel: { x: (e.accelerationIncludingGravity?.x || 0) / 9.81, y: (e.accelerationIncludingGravity?.y || 0) / 9.81, z: (e.accelerationIncludingGravity?.z || 0) / 9.81 } }));
     return;
@@ -16,17 +33,10 @@ async function main() {
   const info = await tux.device.info();
   $('device').textContent = `${info.model} · iOS ${info.version}`;
 
-  // Real Liquid Glass buttons, rendered natively over the page.
-  await tux.ui.setToolbar([
-    { id: 'top', icon: 'arrow.up' },
-    { id: 'haptic', icon: 'hand.tap', title: 'Tap' },
-    { id: 'share', icon: 'square.and.arrow.up' },
-  ]);
-  tux.on('toolbar', ({ id }) => {
-    if (id === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (id === 'haptic') tux.haptic('heavy');
-    if (id === 'share') tux.share('Built on Linux with TuxSign');
-  });
+  // Rim highlights follow the device's tilt, like native Liquid Glass.
+  TuxGlass.followTilt();
+  // Native (SwiftUI) Liquid Glass buttons are also available:
+  //   tux.ui.setToolbar([{ id: 'add', icon: 'plus', title: 'Add' }]); tux.on('toolbar', ({ id }) => ...)
 
   tux.on('motion', showMotion);
   const loc = {};
@@ -64,7 +74,9 @@ function showMotion(m) {
   if (m.magnet) Object.assign(rows, { 'Mag X': fmt(m.magnet.x, 1), 'Mag Y': fmt(m.magnet.y, 1), 'Mag Z': fmt(m.magnet.z, 1) });
   if (m.attitude) Object.assign(rows, { Roll: fmt(m.attitude.roll * 57.3, 1) + '°', Pitch: fmt(m.attitude.pitch * 57.3, 1) + '°' });
   grid($('motion'), rows);
-  $('bubble').style.transform = `translate(${-a.x * 120}px, ${a.y * 60}px)`;
+  const b = $('bubble');
+  b.style.left = `calc(50% + ${(-a.x * 120).toFixed(1)}px)`;
+  b.style.top = `calc(50% + ${(a.y * 45).toFixed(1)}px)`;
 }
 
 // TuxShell injects window.tux before any page script runs.
